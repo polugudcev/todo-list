@@ -1,0 +1,22 @@
+{
+  "name": "todolist",
+  "version": "1.0.0",
+  "description": "",
+  "main": "first.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Azrail07/todolist.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Azrail07/todolist/issues"
+  },
+  "homepage": "https://github.com/Azrail07/todolist#readme",
+  "dependencies": {
+    "nodemon": "^2.0.18"
+  }
+}
