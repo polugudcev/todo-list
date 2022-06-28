@@ -1,17 +1,25 @@
 //const getButton = document.querySelector("button");
-let allTasks = JSON.parse(localStorage.getItem("tasks")) || [];
+let allTasks = [];
 let valueInput = "";
-let input = null;
+//let input = null;
 let activatedEditTask = null;
 
-window.onload = function init() {
+window.onload = async () => {
   input = document.getElementById("input-todo");
-  input.addEventListener("change", updateValue);
-  localStorage.setItem("tasks", JSON.stringify(allTasks));
-  render();
-};
+  if (input === null) {
+    return }
+    input.addEventListener("change", updateValue);
+    // localStorage.setItem("tasks", JSON.stringify(allTasks));
+    const resp = await fetch("http://localhost:3000/allTasks", {
+      method: "GET",
+    });
+    let result = await resp.json();
+    console.log(result);
+    allTasks = result.data;
+    render();
+  };
 
-const clickOnButton = () => {
+const clickOnButton = async () => {
   if (valueInput === "") {
     return;
   }
@@ -19,7 +27,21 @@ const clickOnButton = () => {
     text: valueInput,
     isCheck: false,
   });
-  localStorage.setItem("tasks", JSON.stringify(allTasks));
+  const resp = await fetch("http://localhost:3000/createTask", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json;charset=utf-8",
+      "Access-Control-Allow-Origin": "*",
+    },
+    body: JSON.stringify({
+      text: valueInput,
+      isCheck: false,
+    }),
+  });
+  let result = await resp.json();
+  console.log(result);
+  // allTasks = result.data;
+  //localStorage.setItem("tasks", JSON.stringify(allTasks));
   valueInput = "";
   input.value = "";
 
@@ -31,14 +53,14 @@ const render = () => {
   while (content.firstChild) {
     content.removeChild(content.firstChild);
   }
-  allTasks.forEach((item, index) => {
+  allTasks.map((item, index) => {
     const container = document.createElement("div");
     container.id = `task-${index}`;
     container.classList = "task-container";
     const checkbox = document.createElement("input");
     checkbox.type = "checkbox";
     checkbox.checked = item.isCheck;
-    checkbox.onchange = function () {
+    checkbox.onchange = () => {
       onChangeCheckBox(index);
     };
 
@@ -53,7 +75,8 @@ const render = () => {
     imageEdit.onclick = () => {
       updateTaskText(item, index);
     };
-    container.appendChild(imageEdit);
+    container.appendChild(imageEdit); 
+
 
     const imageDelete = document.createElement("img");
     imageDelete.src = "img/x-circle-fill.svg";
@@ -70,26 +93,26 @@ const updateValue = (event) => {
   valueInput = event.target.value;
 };
 
-const onChangeCheckBox = (index) => {
+const onChangeCheckBox = async (index) => {
   allTasks[index].isCheck = !allTasks[index].isCheck;
-  localStorage.setItem("tasks", JSON.stringify(allTasks));
+ // localStorage.setItem("tasks", JSON.stringify(allTasks));
   render();
 };
 
-const onDeleteTask = (index) => {
+const onDeleteTask = async (index) => {
   allTasks.splice(index, 1);
-  localStorage.setItem("tasks", JSON.stringify(allTasks));
+  //localStorage.setItem("tasks", JSON.stringify(allTasks));
   render();
 };
 
-const updateTaskText = (event, index) => {
+const updateTaskText = async (event, index) => {
   const initText = prompt("vvedite", "");
   allTasks[index].text = initText;
-  localStorage.setItem("tasks", JSON.stringify(allTasks));
+  //localStorage.setItem("tasks", JSON.stringify(allTasks));
   render();
 };
 
-const doneEditTask = () => {
+const doneEditTask = async () => {
   activatedEditTask = null;
   render();
 };
