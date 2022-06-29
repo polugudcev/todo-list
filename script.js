@@ -1,47 +1,40 @@
-//const getButton = document.querySelector("button");
 let allTasks = [];
 let valueInput = "";
-//let input = null;
 let activatedEditTask = null;
+const URL = 'http://localhost:8000'; 
 
 window.onload = async () => {
   input = document.getElementById("input-todo");
   if (input === null) {
-    return }
+    return 
+  }
     input.addEventListener("change", updateValue);
-    // localStorage.setItem("tasks", JSON.stringify(allTasks));
-    const resp = await fetch("http://localhost:3000/allTasks", {
+    const resp = await fetch(`${URL}/allTasks`, {
       method: "GET",
     });
-    let result = await resp.json();
+    const result = await resp.json();
     console.log(result);
-    allTasks = result.data;
+    allTasks = result;
     render();
   };
 
-const clickOnButton = async () => {
+const addButtonValues = async () => {
   if (valueInput === "") {
     return;
   }
-  allTasks.push({
-    text: valueInput,
-    isCheck: false,
-  });
-  const resp = await fetch("http://localhost:3000/createTask", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json;charset=utf-8",
-      "Access-Control-Allow-Origin": "*",
-    },
-    body: JSON.stringify({
+
+  const resp = await fetch(`${URL}/createTask`, {
+    method: 'POST',
+    headers: {'Content-type': 'application/json;charset=utf-8'},
+    body: JSON.stringify({ 
       text: valueInput,
       isCheck: false,
-    }),
+    })
   });
-  let result = await resp.json();
-  console.log(result);
-  // allTasks = result.data;
-  //localStorage.setItem("tasks", JSON.stringify(allTasks));
+  
+  const result = await resp.json();
+  
+  allTasks.push(result);
   valueInput = "";
   input.value = "";
 
@@ -53,38 +46,41 @@ const render = () => {
   while (content.firstChild) {
     content.removeChild(content.firstChild);
   }
-  allTasks.map((item, index) => {
+  allTasks.forEach((item, index) => {
     const container = document.createElement("div");
-    container.id = `task-${index}`;
+    container.id = `task-${item._id}`;
     container.classList = "task-container";
     const checkbox = document.createElement("input");
     checkbox.type = "checkbox";
     checkbox.checked = item.isCheck;
     checkbox.onchange = () => {
-      onChangeCheckBox(index);
+      onChangeCheckBox(item._id);
     };
 
-    container.appendChild(checkbox);
     const text = document.createElement("p");
     text.innerText = item.text;
     text.className = item.isCheck ? "text-task done-text" : "text-task";
-    container.appendChild(text);
-
+  
+    const editButton = document.createElement('button')
+    editButton.onclick = () => {
+      updateTaskText(item._id)
+    };
     const imageEdit = document.createElement("img");
     imageEdit.src = "img/pencil-fill.svg";
-    imageEdit.onclick = () => {
-      updateTaskText(item, index);
+   
+    const imageButton = document.createElement('button');
+    imageButton.onclick =  ()  => {
+      onDeleteTask(item._id);
     };
-    container.appendChild(imageEdit); 
-
-
     const imageDelete = document.createElement("img");
     imageDelete.src = "img/x-circle-fill.svg";
-    imageDelete.onclick = function () {
-      onDeleteTask();
-    };
-    container.appendChild(imageDelete);
-
+    
+    imageButton.appendChild(imageDelete)
+    editButton.appendChild(imageEdit)
+    container.appendChild(checkbox);
+    container.appendChild(text);
+    container.appendChild(editButton)
+    container.appendChild(imageButton);
     content.appendChild(container);
   });
 };
@@ -94,21 +90,35 @@ const updateValue = (event) => {
 };
 
 const onChangeCheckBox = async (index) => {
+
   allTasks[index].isCheck = !allTasks[index].isCheck;
- // localStorage.setItem("tasks", JSON.stringify(allTasks));
   render();
 };
 
-const onDeleteTask = async (index) => {
-  allTasks.splice(index, 1);
-  //localStorage.setItem("tasks", JSON.stringify(allTasks));
-  render();
+const onDeleteTask = async (id) => {
+  try {
+    const resp = await fetch(`${URL}/deleteTask`, {
+      method: 'delete',
+      headers: {'Content-type': 'application/json;charset=utf-8'},
+      body: JSON.stringify({_id: id})
+    });
+    const result = await resp.json();
+
+    if(result.deletedCount !== 1) {
+      throw new Error();
+    }
+
+    const updatedTask = allTasks.filter(item => item._id !== id)
+    allTasks = updatedTask;
+    render();
+  } catch (error) {
+    console.log(error);
+  }
 };
 
 const updateTaskText = async (event, index) => {
   const initText = prompt("vvedite", "");
   allTasks[index].text = initText;
-  //localStorage.setItem("tasks", JSON.stringify(allTasks));
   render();
 };
 
