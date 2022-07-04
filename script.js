@@ -2,6 +2,7 @@ let allTasks = [];
 let valueInput = "";
 const activatedEditTask = null;
 const URL = "http://localhost:8000";
+let newEdittask = "";
 
 window.onload = async () => {
   input = document.getElementById("input-todo");
@@ -47,7 +48,6 @@ const render = () => {
   }
   allTasks.forEach(({ _id, isCheck, text }) => {
     const container = document.createElement("div");
-    container.id = `task-${_id}`;
     container.classList = "task-container";
     const checkbox = document.createElement("input");
     checkbox.type = "checkbox";
@@ -56,30 +56,59 @@ const render = () => {
       onChangeCheckBox(_id);
     };
 
+    const editBlock = document.createElement("div");
+    editBlock.className = "hidden";
+
+    const editNewInput = document.createElement("input");
+    editNewInput.value = text;
+    editNewInput.onchange = (e) => {
+      newEdittask = e.target.value;
+    };
+
+    const editButton = document.createElement("button");
+    editBlock.id = `edit-${_id}`;
+    editButton.onclick = () => {
+      updateTaskText(_id);
+    };
+    const cancelButton = document.createElement("button");
+    cancelButton.onclick = () => {
+      closeEditBlock(_id);
+    };
+
+    const taskBlock = document.createElement("div");
+    taskBlock.className = `task`;
+    taskBlock.id = `task-${_id}`;
+
     const textCreater = document.createElement("p");
     textCreater.innerText = text;
     textCreater.className = isCheck ? "text-task done-text" : "text-task";
 
-    const editButton = document.createElement("button");
-    editButton.onclick = () => {
-      updateTaskText(_id);
+    const openEdit = document.createElement("button");
+    openEdit.onclick = () => {
+      openEditBlock(_id);
+      //  updateTaskText(_id);
     };
     const imageEdit = document.createElement("img");
     imageEdit.src = "img/pencil-fill.svg";
 
-    const imageButton = document.createElement("button");
-    imageButton.onclick = () => {
+    const deleteButton = document.createElement("button");
+    deleteButton.onclick = () => {
       onDeleteTask(_id);
     };
     const imageDelete = document.createElement("img");
     imageDelete.src = "img/x-circle-fill.svg";
 
-    imageButton.appendChild(imageDelete);
-    editButton.appendChild(imageEdit);
-    container.appendChild(checkbox);
-    container.appendChild(textCreater);
-    container.appendChild(editButton);
-    container.appendChild(imageButton);
+    taskBlock.appendChild(checkbox);
+    taskBlock.appendChild(textCreater);
+    taskBlock.appendChild(openEdit);
+    taskBlock.appendChild(deleteButton);
+    editBlock.appendChild(editNewInput);
+    editBlock.appendChild(editButton);
+    editBlock.appendChild(cancelButton);
+    openEdit.appendChild(imageEdit);
+    deleteButton.appendChild(imageDelete);
+    container.appendChild(taskBlock);
+    container.appendChild(editBlock);
     content.appendChild(container);
   });
 };
@@ -88,9 +117,40 @@ const updateValue = (event) => {
   valueInput = event.target.value;
 };
 
-const onChangeCheckBox = async (index) => {
-    allTasks[index].isCheck = !allTasks[index].isCheck;
-    render();
+const onChangeCheckBox = async (id) => {
+  const selectedTask = allTasks.find((item) => item._id === id);
+  console.log("dsdsd", selectedTask);
+  const { _id, text, isCheck = !isCheck } = selectedTask;
+  allTasks[index].isCheck = !allTasks[index].isCheck;
+  console.log(allTasks);
+  try {
+    const resp = await fetch(`${URL}/updateTask`, {
+      method: "PATCH",
+      headers: { "Content-type": "application/json;charset=utf-8" },
+      body: JSON.stringify({ _id, text, isCheck }),
+    });
+  } catch (error) {
+    console.log(error);
+  }
+  render();
+};
+
+const openEditBlock = (id) => {
+  const taskBlock = document.querySelector(`#task-${id}`);
+  taskBlock.classList.add("hidden");
+  taskBlock.classList.remove("task");
+  const editBlock = document.querySelector(`#edit-${id}`);
+  editBlock.classList.remove("hidden");
+  editBlock.classList.add("task");
+};
+
+const closeEditBlock = (id) => {
+  const taskBlock = document.querySelector(`#task-${id}`);
+  taskBlock.classList.remove("hidden");
+  taskBlock.classList.add("task");
+  const editBlock = document.querySelector(`#edit-${id}`);
+  editBlock.classList.add("hidden");
+  editBlock.classList.remove("task");
 };
 
 const onDeleteTask = async (id) => {
@@ -113,11 +173,27 @@ const onDeleteTask = async (id) => {
     console.log(error);
   }
 };
+const updateTaskText = async (id, text) => {
+  allTasks.find((item) => item._id === id);
+  try {
+    const resp = await fetch(`${URL}/updateTask`, {
+      method: "PATCH",
+      headers,
+      body: JSON.stringify({
+        text,
+        _id: id,
+      }),
+    });
 
-const updateTaskText = async (id) => {
-  const initText = prompt("vvedite", "");
-  allTasks[index].text = initText;
-  render();
+    allTasks.forEach((element) => {
+      if (element._id === id) {
+        element.text = text;
+      }
+    });
+    render();
+  } catch (error) {
+    console.log(error);
+  }
 };
 
 const doneEditTask = async () => {
