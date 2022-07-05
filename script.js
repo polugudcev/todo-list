@@ -5,20 +5,26 @@ const URL = "http://localhost:8000";
 let newEdittask = "";
 
 window.onload = async () => {
-  input = document.getElementById("input-todo");
+  const input = document.getElementById("input-todo");
   if (input === null) {
     return;
   }
   input.addEventListener("change", updateValue);
-  const resp = await fetch(`${URL}/allTasks`, {
-    method: "GET",
-  });
-  const result = await resp.json();
-  allTasks = result;
+  allTasks = await fetchAllTasks();
   render();
 };
 
-const addButtonValues = async () => {
+const fetchAllTasks = async () => {
+  const resp = await fetch(`${URL}/allTasks`, {
+    method: "GET",
+    headers: { "Content-type": "application/json;charset=utf-8" },
+  });
+  const result = await resp.json();
+  return result;
+};
+
+const addNewTask = async () => {
+  const input = document.getElementById("input-todo");
   if (valueInput.trim() === "") {
     return;
   }
@@ -37,7 +43,6 @@ const addButtonValues = async () => {
   allTasks.push(result);
   valueInput = "";
   input.value = "";
-
   render();
 };
 
@@ -60,17 +65,20 @@ const render = () => {
     editBlock.className = "hidden";
 
     const editNewInput = document.createElement("input");
+    editNewInput.id = `input-${_id}`;
+
     editNewInput.value = text;
     editNewInput.onchange = (e) => {
       newEdittask = e.target.value;
     };
-
     const editButton = document.createElement("button");
+    editButton.innerText = "add";
     editBlock.id = `edit-${_id}`;
     editButton.onclick = () => {
       updateTaskText(_id);
     };
     const cancelButton = document.createElement("button");
+    cancelButton.innerText = "cancel";
     cancelButton.onclick = () => {
       closeEditBlock(_id);
     };
@@ -86,7 +94,6 @@ const render = () => {
     const openEdit = document.createElement("button");
     openEdit.onclick = () => {
       openEditBlock(_id);
-      //  updateTaskText(_id);
     };
     const imageEdit = document.createElement("img");
     imageEdit.src = "img/pencil-fill.svg";
@@ -119,16 +126,15 @@ const updateValue = (event) => {
 
 const onChangeCheckBox = async (id) => {
   const selectedTask = allTasks.find((item) => item._id === id);
-  console.log("dsdsd", selectedTask);
   const { _id, text, isCheck = !isCheck } = selectedTask;
   allTasks[index].isCheck = !allTasks[index].isCheck;
-  console.log(allTasks);
   try {
     const resp = await fetch(`${URL}/updateTask`, {
       method: "PATCH",
       headers: { "Content-type": "application/json;charset=utf-8" },
-      body: JSON.stringify({ _id, text, isCheck }),
+      body: JSON.stringify({ _id, isCheck }),
     });
+    const result = await resp.json();
   } catch (error) {
     console.log(error);
   }
@@ -170,30 +176,30 @@ const onDeleteTask = async (id) => {
     allTasks = updatedTask;
     render();
   } catch (error) {
-    console.log(error);
+    alert(error);
   }
 };
-const updateTaskText = async (id, text) => {
+const updateTaskText = async (id) => {
+  const editInput = document.querySelector(`#input-${id}`);
   allTasks.find((item) => item._id === id);
   try {
     const resp = await fetch(`${URL}/updateTask`, {
       method: "PATCH",
-      headers,
+      headers: { "Content-type": "application/json;charset=utf-8" },
       body: JSON.stringify({
-        text,
+        text: editInput.value,
         _id: id,
       }),
     });
-
+    const result = await resp.json();
     allTasks.forEach((element) => {
       if (element._id === id) {
-        element.text = text;
+        element.text = editInput.value;
       }
     });
     render();
-  } catch (error) {
-    console.log(error);
-  }
+    closeEditBlock();
+  } catch (error) {}
 };
 
 const doneEditTask = async () => {
