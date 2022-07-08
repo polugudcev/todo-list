@@ -1,11 +1,11 @@
 html {
   height: 100%;
   background-image: linear-gradient(to right top,
-      #4a2354,
-      #83d1bb,
-      #00a1ba,
-      #ba1cbd,
-      #06160f);
+  #4a2354,
+  #83d1bb,
+  #00a1ba,
+  #ba1cbd,
+  #06160f);
 }
 
 .container {
@@ -91,11 +91,11 @@ html {
 
 .task {
   background-image: linear-gradient(to right top,
-      #4a2354,
-      #83d1bb,
-      #00a1ba,
-      #ba1cbd,
-      #06160f);
+  #4a2354,
+  #83d1bb,
+  #00a1ba,
+  #ba1cbd,
+  #06160f);
   display: flex;
   width: 100%;
   justify-content: space-between;
@@ -119,3 +119,4 @@ input[type="checkbox"]:checked+p {
   text-decoration: line-through;
   color: rgb(147, 45, 206);
 }
+
