@@ -1,0 +1,122 @@
+html {
+  height: 100%;
+  background-image: linear-gradient(to right top,
+  #4a2354,
+  #83d1bb,
+  #00a1ba,
+  #ba1cbd,
+  #06160f);
+}
+
+.container {
+  max-width: 1140px;
+  margin: 0 auto;
+}
+
+.todo-list {
+  text-align: center;
+  margin-top: 200px;
+}
+
+.todo-h1 {
+  font-size: 46px;
+}
+
+.todo-list img {
+  width: 200px;
+  mix-blend-mode: multiply;
+}
+
+.todo-logo {
+  color: darkred;
+  font-size: 46px;
+}
+
+.task-container {
+  margin-top: 50px;
+  height: 50px;
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+  background: cornflowerblue;
+  margin-bottom: 20px;
+}
+
+.text-task {
+  font-size: 18px;
+  color: blue;
+}
+
+.done-text {
+  font-size: 18px;
+  color: red;
+  text-decoration: line-through;
+}
+
+.todo-list__input button {
+  color: white;
+  background-color: darkred;
+  height: 30px;
+}
+
+.todo-list__input {
+  padding-top: 25px;
+  padding-bottom: 25px;
+}
+
+.input-main {
+  outline: none;
+  border: none;
+  background: pink;
+}
+
+.task-container img {
+  width: 15px;
+  box-shadow: none;
+}
+
+.input-main {
+  width: 320px;
+  height: 30px;
+}
+
+.content__page button {
+  background-color: rgb(203 73 169);
+  border-radius: 20%;
+}
+
+.hidden {
+  display: none;
+}
+
+.task {
+  background-image: linear-gradient(to right top,
+  #4a2354,
+  #83d1bb,
+  #00a1ba,
+  #ba1cbd,
+  #06160f);
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+}
+
+.task input {
+  margin-left: 30px;
+}
+
+.task p {
+  color: #ba1cbd;
+}
+
+.task button {
+  margin-right: 100px;
+  height: 50%;
+  margin-top: 15px;
+}
+
+input[type="checkbox"]:checked+p {
+  text-decoration: line-through;
+  color: rgb(147, 45, 206);
+}
+
